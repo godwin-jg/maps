@@ -1,7 +1,9 @@
 import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
+import 'package:maps/PlaceDetailsScreen.dart';
 import 'package:maps/login.dart';
+import 'package:maps/path.dart';
 // import 'package:maps/path.dart';
 
 void main() {
@@ -14,7 +16,8 @@ class MyApp extends StatelessWidget {
     return MaterialApp(
       title: 'Google Places API Demo',
       debugShowCheckedModeBanner: false,
-      home: LoginScreen(),
+      home: PlacesScreen(),
+      // home: PlaceDetailsScreen("ChIJC7os9czxqzsRR8pocACJme4"),
     );
   }
 }
@@ -31,11 +34,12 @@ class _PlacesScreenState extends State<PlacesScreen> {
 
   String source = '';
   String destination = '';
-  List<String> places = [];
-  List<String> places2 = [];
-  List<String> intersection = [];
+  List<Map<String, dynamic>> places = [];
+  List<Map<String, dynamic>> places2 = [];
+  List<Map<String, dynamic>> intersection = [];
   TextEditingController sourceController = TextEditingController();
   TextEditingController destinationController = TextEditingController();
+  List<String> placePhotos = [];
 
   @override
   void initState() {
@@ -59,9 +63,16 @@ class _PlacesScreenState extends State<PlacesScreen> {
 
         setState(() {
           places.clear();
-          places = results.map((place) => place['name'].toString()).toList();
+          places = results.map((place) {
+            return {
+              'name': place['name'].toString(),
+              'id': place['place_id'].toString()
+            };
+          }).toList();
         });
       }
+      print(places);
+      print("Come on we can do it");
       final response2 = await http.get(Uri.parse(apiUrl2));
       if (response2.statusCode == 200) {
         final Map<String, dynamic> data = json.decode(response2.body);
@@ -70,9 +81,16 @@ class _PlacesScreenState extends State<PlacesScreen> {
 
         setState(() {
           places2.clear();
-          places2 = results.map((place) => place['name'].toString()).toList();
+          places2 = results.map((place) {
+            return {
+              'name': place['name'].toString(),
+              'id': place['place_id'].toString()
+            };
+          }).toList();
         });
         findIntersection();
+        print(intersection);
+        print("this is intersection");
       } else {
         throw Exception('Failed to load data');
       }
@@ -84,7 +102,11 @@ class _PlacesScreenState extends State<PlacesScreen> {
   void findIntersection() {
     setState(() {
       intersection.clear();
-      intersection = places.toSet().union(places2.toSet()).toList();
+      Set<Map<String, dynamic>> unionSet =
+          Set<Map<String, dynamic>>.from(places);
+      unionSet.addAll(places2);
+      intersection = unionSet.toList();
+      // intersection = places.toSet().union(places2.toSet()).toList();
     });
   }
 
@@ -148,8 +170,20 @@ class _PlacesScreenState extends State<PlacesScreen> {
                     child: ListView.builder(
                       itemCount: intersection.length,
                       itemBuilder: (context, index) {
-                        return ListTile(
-                          title: Text(intersection[index]),
+                        return GestureDetector(
+                          onTap: () {
+                            Navigator.push(
+                              context,
+                              MaterialPageRoute(
+                                  builder: (context) => PlaceDetailsScreen(
+                                      intersection[index]['id'],
+                                      intersection[index]['name'])),
+                            );
+                          },
+                          child: ListTile(
+                            title: Text(intersection[index]['name']),
+                            // subtitle: Text(intersection[index]['id']),
+                          ),
                         );
                       },
                     ),
