@@ -32,7 +32,6 @@ class _PlacesScreenState extends State<PlacesScreen> {
 
   final String apiUrl2 =
       'https://maps.googleapis.com/maps/api/place/textsearch/json?query=$destination+point+of+interest&language=en&radius=50000&key=$apiKey';
-  // https://maps.googleapis.com/maps/api/place/textsearch/json?query=dubai+point+of+interest&language=en&radius=2000&key
 
   List<String> places = [];
   List<String> places2 = [];

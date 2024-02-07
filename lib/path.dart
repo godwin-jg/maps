@@ -52,7 +52,6 @@ class OrderTrackingPageState extends State<OrderTrackingPage> {
     PolylinePoints polylinePoints = PolylinePoints();
 
     PolylineResult result = await polylinePoints.getRouteBetweenCoordinates(
-      // "AIzaSyBumOL17qUZfsuph0ohCl0RMaBEqhRC8Iw",
       google_api_key,
       PointLatLng(sourceLocation.latitude, sourceLocation.longitude),
       PointLatLng(destination.latitude, destination.longitude),
